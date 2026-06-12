@@ -1,33 +1,36 @@
 import React from 'react';
-import { Search, Sun, Moon, Bell } from 'lucide-react';
+import { Search, Sun, Moon, Bell, Menu } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
-export default function Navbar() {
+export default function Navbar({ onMenuToggle }) {
   const { darkMode, setDarkMode, searchQuery, setSearchQuery } = useDashboard();
 
   return (
     <header className="h-20 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 transition-all duration-500">
-     {/* Search Bar Container - 100% FIXED OVERLAP */}
-<div className="relative w-full sm:w-80 flex items-center bg-slate-100/80 dark:bg-slate-800/80 rounded-xl px-4 py-2.5 border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 group">
-  
-  {/* Icon - Left Aligned inside the container wrapper */}
-  <div className="shrink-0 mr-3 flex items-center justify-center pointer-events-none">
-    <Search className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-300" />
-  </div>
-
-  {/* Input Field - Clean, Raw and unpadded layout */}
-  <input
-    type="text"
-    placeholder="Search transactions, tags..."
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    style={{ background: 'transparent', border: 'none', outline: 'none', padding: 0, width: '100%' }}
-    className="text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:ring-0 focus:outline-none"
-  />
-</div>
-
+      <div className="flex items-center gap-3 w-full min-w-0">
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="md:hidden p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 transition-all duration-300 flex-shrink-0"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="relative flex-1 min-w-0 flex items-center bg-slate-100/80 dark:bg-slate-800/80 rounded-xl px-4 py-2.5 border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 group overflow-hidden">
+          <div className="shrink-0 mr-3 flex items-center justify-center pointer-events-none">
+            <Search className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-300" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search transactions, tags..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ background: 'transparent', border: 'none', outline: 'none', padding: 0, width: '100%' }}
+            className="text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:ring-0 focus:outline-none min-w-0"
+          />
+        </div>
+      </div>
       {/* Action Controls */}
-      <div className="flex items-center gap-4 flex-wrap justify-end">
+      <div className="hidden md:flex items-center gap-3 flex-shrink-0 flex-wrap justify-end">
         {/* Theme Toggle Button with Rotate Animation */}
         <button
           onClick={() => setDarkMode(!darkMode)}

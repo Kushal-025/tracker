@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
 
@@ -8,22 +8,28 @@ export default function AnalyticsCharts() {
   const { transactions } = useDashboard();
 
   // Aggregate Category breakdown data for Expense Pie
-  const expenseByCategory = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, t) => {
-      const existing = acc.find(item => item.name === t.category);
-      if (existing) existing.value += parseFloat(t.amount);
-      else acc.push({ name: t.category, value: parseFloat(t.amount) });
-      return acc;
-    }, []);
+  const expenseByCategory = useMemo(() => {
+    return transactions
+      .filter((t) => t.type === 'expense')
+      .reduce((acc, t) => {
+        const amount = parseFloat(t.amount) || 0;
+        const existing = acc.find((item) => item.name === t.category);
+        if (existing) existing.value += amount;
+        else acc.push({ name: t.category, value: amount });
+        return acc;
+      }, []);
+  }, [transactions]);
 
   // Structural mapping configuration for chronological trendline
-  const sortedData = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-  const timelineData = sortedData.map(t => ({
-    date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    Amount: parseFloat(t.amount),
-    Type: t.type
-  }));
+  const timelineData = useMemo(() => {
+    return [...transactions]
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .map((t) => ({
+        date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        Amount: parseFloat(t.amount) || 0,
+        Type: t.type,
+      }));
+  }, [transactions]);
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 my-6">
@@ -50,16 +56,24 @@ export default function AnalyticsCharts() {
 
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
         <h4 className="text-base font-semibold mb-4 dark:text-white">Expense Distribution</h4>
-        <div className="h-56 sm:h-72 flex-1 relative">
+        <div className="h-56 sm:h-72 flex-1 relative min-h-[240px]">
           {expenseByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={expenseByCategory} innerRadius={60} outerRadius={80} paddingAngle={4} dataKey="value">
+                <Pie
+                  data={expenseByCategory}
+                  innerRadius="40%"
+                  outerRadius="60%"
+                  paddingAngle={4}
+                  dataKey="value"
+                  labelLine={false}
+                  isAnimationActive={false}
+                >
                   {expenseByCategory.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
