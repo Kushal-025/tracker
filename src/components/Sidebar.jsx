@@ -18,7 +18,7 @@ export default function Sidebar() {
           <TrendingUp className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
         </div>
         <span className="text-xl font-bold tracking-tight bg-linear-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
-          AuraFinance
+         Rohit Expenses Tracker
         </span>
       </div>
 
