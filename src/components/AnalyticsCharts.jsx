@@ -26,10 +26,10 @@ export default function AnalyticsCharts() {
   }));
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-6">
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-2">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 my-6">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm xl:col-span-2">
         <h4 className="text-base font-semibold mb-4 dark:text-white">Cash Flow Dynamics</h4>
-        <div className="h-72">
+        <div className="h-64 sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={timelineData}>
               <defs>
@@ -50,7 +50,7 @@ export default function AnalyticsCharts() {
 
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
         <h4 className="text-base font-semibold mb-4 dark:text-white">Expense Distribution</h4>
-        <div className="h-56 flex-1 relative">
+        <div className="h-56 sm:h-72 flex-1 relative">
           {expenseByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -66,7 +66,7 @@ export default function AnalyticsCharts() {
             <div className="flex h-full items-center justify-center text-sm text-slate-400">No analytical data compiled</div>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-2 mt-4 max-h-24 overflow-y-auto pr-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 max-h-24 overflow-y-auto pr-1">
           {expenseByCategory.map((entry, index) => (
             <div key={entry.name} className="flex items-center gap-2 text-xs">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />

@@ -6,7 +6,7 @@ export default function StatCard({ title, amount, icon: Icon, gradient, subtitle
       <div className="flex justify-between items-start">
         <div>
           <p className="text-white/70 text-sm font-medium tracking-wide uppercase">{title}</p>
-          <h3 className="text-3xl font-bold mt-2 tracking-tight">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+          <h3 className="text-3xl font-bold mt-2 tracking-tight">₹{amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
         </div>
         <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
           <Icon className="w-6 h-6 text-white" />

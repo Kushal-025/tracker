@@ -39,7 +39,7 @@ export default function FinancialInsights() {
                 <p className="text-slate-400 text-[10px]">Autopay execution scheduled in 4 days</p>
               </div>
             </div>
-            <span className="font-bold text-slate-700 dark:text-slate-300">$120.00</span>
+            <span className="font-bold text-slate-700 dark:text-slate-300">₹120.00</span>
           </div>
         </div>
       </div>

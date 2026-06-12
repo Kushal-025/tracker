@@ -38,11 +38,11 @@ function DashboardContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <Navbar />
         
-        <main className="flex-1 p-6 md:p-8 max-w-400 w-full mx-auto space-y-8">
+        <main className="flex-1 px-4 py-6 sm:px-6 md:px-8 max-w-[1600px] w-full mx-auto space-y-8">
           
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-[fadeIn_0.4s_ease-out]">
-            <div>
+            <div className="min-w-0">
               <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Financial Strategy
               </h1>
@@ -52,7 +52,7 @@ function DashboardContent() {
             </div>
             <button
               onClick={openAddModal}
-              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-5 py-3 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 self-start sm:self-center"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-5 py-3 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 self-start sm:self-center"
             >
               <Plus className="w-4 h-4" /> Log Transaction
             </button>
@@ -74,7 +74,7 @@ function DashboardContent() {
           <FinancialInsights />
 
           {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider pl-1">Quick Filters:</div>
             <select 
               value={typeFilter} 

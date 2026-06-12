@@ -51,7 +51,7 @@ export default function TransactionModal({ isOpen, onClose, activeItem }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Amount ($)</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Amount (₹)</label>
               <input type="number" required step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
             </div>
           </div>

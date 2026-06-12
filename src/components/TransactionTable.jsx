@@ -80,7 +80,7 @@ export default function TransactionTable({ onEdit }) {
                 </td>
                 <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-300 max-w-50 truncate">{tx.description}</td>
                 <td className={`px-6 py-4 font-semibold whitespace-nowrap text-base ${tx.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {tx.type === 'income' ? '+' : '-'}${parseFloat(tx.amount).toFixed(2)}
+                  {tx.type === 'income' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
