@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTravel } from '../context/TravelContext';
-import { Search, Filter, Heart, Star, MapPin, X, Globe, DollarSign } from 'lucide-react';
+import { Search, Filter, Heart, Star, MapPin, X, Globe, IndianRupee } from 'lucide-react';
 
 const continents = ['All', 'Europe', 'Asia', 'Africa', 'North America', 'South America'];
 const types = ['All', 'beach', 'city', 'adventure', 'culture'];
@@ -37,8 +37,8 @@ function DestModal({ dest, onClose }) {
               <span className="text-sm font-semibold text-amber-300">{dest.rating} / 5.0</span>
             </div>
             <div className="flex items-center gap-1.5 glass px-3 py-1.5 rounded-full">
-              <DollarSign size={13} className="text-emerald-400" />
-              <span className="text-sm font-semibold text-emerald-300">From ${dest.price}</span>
+              <IndianRupee size={13} className="text-emerald-400" />
+              <span className="text-sm font-semibold text-emerald-300">From ₹{dest.price}</span>
             </div>
             <div className="glass px-3 py-1.5 rounded-full">
               <span className="text-xs text-slate-300 capitalize">{dest.continent}</span>
@@ -159,7 +159,7 @@ export default function Explore() {
                     <Star size={11} className="fill-amber-400 text-amber-400" />
                     <span className="text-xs text-amber-300 font-semibold">{dest.rating}</span>
                   </div>
-                  <span className="text-xs text-white/60">from <span className="text-amber-400 font-bold">${dest.price}</span></span>
+                  <span className="text-xs text-white/60">from <span className="text-amber-400 font-bold">₹{dest.price}</span></span>
                 </div>
               </div>
             </div>

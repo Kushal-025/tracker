@@ -31,7 +31,7 @@ function DestCard({ dest, compact }) {
             <Star size={11} className="fill-amber-400 text-amber-400" />
             <span className="text-xs text-amber-300 font-medium">{dest.rating}</span>
           </div>
-          <span className="text-xs text-white/60">from <span className="text-amber-400 font-semibold">${dest.price}</span></span>
+          <span className="text-xs text-white/60">from <span className="text-amber-400 font-semibold">₹{dest.price}</span></span>
         </div>
       </div>
     </div>
@@ -161,7 +161,7 @@ export default function Home() {
                     <Star size={11} className="fill-amber-400 text-amber-400" />
                     <span className="text-xs text-amber-300 font-semibold">{d.rating}</span>
                   </div>
-                  <span className="text-amber-400 text-xs font-bold">${d.price}</span>
+                  <span className="text-amber-400 text-xs font-bold">₹{d.price}</span>
                 </div>
               </div>
             </div>

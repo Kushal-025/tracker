@@ -50,7 +50,7 @@ function AddTripModal({ onClose, onAdd }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-slate-400 block mb-1.5">Total Budget ($)</label>
+            <label className="text-xs text-slate-400 block mb-1.5">Total Budget (₹)</label>
             <input type="number" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: e.target.value }))} placeholder="2000" className="w-full px-4 py-3 text-sm" />
           </div>
           <div>
@@ -135,12 +135,12 @@ function TripDetail({ trip, onClose, onAddDay, onAddExpense }) {
               <div className="glass rounded-xl p-4">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-slate-400">Budget Used</span>
-                  <span className="text-white font-semibold">${spent} / ${trip.budget}</span>
+                  <span className="text-white font-semibold">₹{spent} / ₹{trip.budget}</span>
                 </div>
                 <div className="progress-bar">
                   <div className="progress-fill" style={{ width: `${pct}%`, background: pct > 90 ? '#ef4444' : 'linear-gradient(to right, #f59e0b, #f97316)' }} />
                 </div>
-                <p className={`text-xs mt-1.5 ${pct > 90 ? 'text-red-400' : 'text-slate-400'}`}>${Math.max(0, trip.budget - spent)} remaining</p>
+                <p className={`text-xs mt-1.5 ${pct > 90 ? 'text-red-400' : 'text-slate-400'}`}>₹{Math.max(0, trip.budget - spent)} remaining</p>
               </div>
 
               {trip.expenses.map(exp => (
@@ -149,7 +149,7 @@ function TripDetail({ trip, onClose, onAddDay, onAddExpense }) {
                     <p className="text-sm font-medium text-white">{exp.label}</p>
                     <p className="text-xs text-slate-500">{exp.category}</p>
                   </div>
-                  <span className="text-amber-400 font-bold">${exp.amount}</span>
+                  <span className="text-amber-400 font-bold">₹{exp.amount}</span>
                 </div>
               ))}
 
@@ -159,7 +159,7 @@ function TripDetail({ trip, onClose, onAddDay, onAddExpense }) {
                   <select value={expForm.category} onChange={e => setExpForm(p => ({ ...p, category: e.target.value }))} className="px-3 py-2 text-sm">
                     {categories.map(c => <option key={c} value={c} className="bg-slate-800">{c}</option>)}
                   </select>
-                  <input type="number" value={expForm.amount} onChange={e => setExpForm(p => ({ ...p, amount: e.target.value }))} placeholder="Amount ($)" className="px-3 py-2 text-sm" />
+                  <input type="number" value={expForm.amount} onChange={e => setExpForm(p => ({ ...p, amount: e.target.value }))} placeholder="Amount (₹)" className="px-3 py-2 text-sm" />
                 </div>
                 <input type="text" value={expForm.label} onChange={e => setExpForm(p => ({ ...p, label: e.target.value }))} placeholder="Description" className="w-full px-3 py-2 text-sm mb-3" />
                 <button onClick={() => { if (expForm.amount && expForm.label) { onAddExpense(trip.id, expForm); setExpForm({ category: 'Food', amount: '', label: '' }); } }}
@@ -233,7 +233,7 @@ export default function Trips() {
                     <>
                       <div className="flex justify-between text-xs mb-1.5">
                         <span className="text-slate-400">Budget</span>
-                        <span className="text-white">${spent} / ${trip.budget}</span>
+                        <span className="text-white">₹{spent} / ₹{trip.budget}</span>
                       </div>
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: `${pct}%`, background: 'linear-gradient(to right, #f59e0b, #f97316)' }} />

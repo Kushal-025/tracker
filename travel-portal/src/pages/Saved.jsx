@@ -49,7 +49,7 @@ export default function Saved() {
                   <div className="flex gap-2">
                     {dest.tags.slice(0, 2).map(tag => <span key={tag} className="tag text-xs">{tag}</span>)}
                   </div>
-                  <span className="text-amber-400 text-xs font-bold">${dest.price}</span>
+                  <span className="text-amber-400 text-xs font-bold">₹{dest.price}</span>
                 </div>
                 <button
                   onClick={() => setPage('trips')}

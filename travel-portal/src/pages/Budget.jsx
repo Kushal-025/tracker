@@ -1,5 +1,5 @@
 import { useTravel } from '../context/TravelContext';
-import { DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
+import { IndianRupee, TrendingUp, AlertTriangle } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 const COLORS = ['#f59e0b', '#f97316', '#06b6d4', '#7c3aed', '#10b981', '#ec4899', '#64748b'];
@@ -9,7 +9,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <div className="glass rounded-xl p-3 border border-amber-500/20 text-sm">
         <p className="text-slate-400 mb-1">{label || payload[0].name}</p>
-        <p className="font-bold text-amber-400">${payload[0].value}</p>
+        <p className="font-bold text-amber-400">₹{payload[0].value}</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export default function Budget() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Budget', value: totalBudget, icon: DollarSign, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+          { label: 'Total Budget', value: totalBudget, icon: IndianRupee, color: 'text-amber-400', bg: 'bg-amber-500/10' },
           { label: 'Total Spent', value: totalSpent, icon: TrendingUp, color: 'text-orange-400', bg: 'bg-orange-500/10' },
           { label: 'Remaining', value: totalRemaining, icon: AlertTriangle, color: totalRemaining < 0 ? 'text-red-400' : 'text-emerald-400', bg: totalRemaining < 0 ? 'bg-red-500/10' : 'bg-emerald-500/10' },
         ].map(({ label, value, icon: Icon, color, bg }) => (
@@ -50,7 +50,7 @@ export default function Budget() {
             <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mx-auto mb-3`}>
               <Icon size={22} className={color} />
             </div>
-            <p className={`text-3xl font-black ${color}`}>${value.toLocaleString()}</p>
+            <p className={`text-3xl font-black ${color}`}>₹{value.toLocaleString()}</p>
             <p className="text-xs text-slate-400 mt-1">{label}</p>
           </div>
         ))}
@@ -58,7 +58,7 @@ export default function Budget() {
 
       {allExpenses.length === 0 ? (
         <div className="glass rounded-2xl p-16 text-center">
-          <DollarSign size={40} className="text-slate-600 mx-auto mb-3" />
+          <IndianRupee size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">No expenses tracked yet. Add expenses from your trip details!</p>
         </div>
       ) : (
@@ -78,7 +78,7 @@ export default function Budget() {
                 {pieData.map((d, i) => (
                   <div key={d.name} className="flex items-center gap-1.5 text-xs">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
-                    <span className="text-slate-400">{d.name} <span className="text-white font-medium">${d.value}</span></span>
+                    <span className="text-slate-400">{d.name} <span className="text-white font-medium">₹{d.value}</span></span>
                   </div>
                 ))}
               </div>
@@ -108,7 +108,7 @@ export default function Budget() {
                   <div key={trip.id}>
                     <div className="flex justify-between text-sm mb-1.5">
                       <span className="text-white font-medium">{trip.name}</span>
-                      <span className="text-slate-400">${trip.spent} / ${trip.budget}</span>
+                      <span className="text-slate-400">₹{trip.spent} / ₹{trip.budget}</span>
                     </div>
                     <div className="progress-bar">
                       <div className="progress-fill" style={{ width: `${pct}%`, background: pct > 90 ? '#ef4444' : 'linear-gradient(to right, #f59e0b, #f97316)' }} />
@@ -128,7 +128,7 @@ export default function Budget() {
                     <p className="text-sm font-medium text-white">{exp.label}</p>
                     <p className="text-xs text-slate-500">{exp.category} · {exp.tripName}</p>
                   </div>
-                  <span className="text-amber-400 font-bold text-sm">${exp.amount}</span>
+                  <span className="text-amber-400 font-bold text-sm">₹{exp.amount}</span>
                 </div>
               ))}
             </div>
