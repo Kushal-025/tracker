@@ -53,7 +53,8 @@ export default function TransactionTable({ onEdit }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Spreadsheet Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
           <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 uppercase text-[11px] tracking-wider font-semibold">
             <tr>
@@ -101,10 +102,48 @@ export default function TransactionTable({ onEdit }) {
             ))}
           </tbody>
         </table>
-        {filteredTransactions.length === 0 && (
-          <div className="p-8 text-center text-slate-400 text-sm">No transaction execution records match your active criteria parameters.</div>
-        )}
       </div>
+
+      {/* Mobile Card-List View */}
+      <div className="block md:hidden p-4 space-y-3">
+        {filteredTransactions.map((tx) => (
+          <div key={tx.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-slate-150 dark:border-slate-800 rounded-2xl p-4 space-y-3 transition-all hover:-translate-y-0.5 duration-350 hover:shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">{tx.date}</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-1 text-sm">{tx.description}</p>
+              </div>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
+                {tx.category}
+              </span>
+            </div>
+            
+            <div className="flex justify-between items-center pt-3 border-t border-slate-150 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className={`text-base font-extrabold ${tx.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {tx.type === 'income' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
+                </span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  {tx.status}
+                </span>
+              </div>
+              
+              <div className="flex gap-1.5">
+                <button onClick={() => onEdit(tx)} className="p-2 hover:bg-slate-150 dark:hover:bg-slate-800 rounded-xl text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" aria-label="Edit transaction">
+                  <Edit3 className="w-4 h-4" />
+                </button>
+                <button onClick={() => deleteTransaction(tx.id)} className="p-2 hover:bg-slate-150 dark:hover:bg-slate-800 rounded-xl text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" aria-label="Delete transaction">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredTransactions.length === 0 && (
+        <div className="p-8 text-center text-slate-400 text-sm">No transaction records match your active search filters.</div>
+      )}
     </div>
   );
 }

@@ -30,14 +30,15 @@ function DashboardContent() {
   return (
     <>
       {/* items-stretch se sidebar aur content area ek dusre ke relative expand honge */}
-      <div className="flex items-stretch min-h-screen w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-500 ease-in-out">
-      
-      {/* 100% Relative Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar onMenuToggle={() => setSidebarOpen(prev => !prev)} />
+      <div className="flex items-stretch min-h-screen w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-500 ease-in-out relative">
+        <div className="aurora" />
+        
+        {/* 100% Relative Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 relative z-10">
+          <Navbar onMenuToggle={() => setSidebarOpen(prev => !prev)} />
         
         <main className="flex-1 px-4 py-6 sm:px-6 md:px-8 max-w-[1600px] w-full mx-auto space-y-8">
           
