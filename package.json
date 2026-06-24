@@ -6,7 +6,7 @@
   "scripts": {
     "dev:frontend": "vite",
     "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run server\"",
-    "server": "node server/server.cjs",
+    "server": "node server/server.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

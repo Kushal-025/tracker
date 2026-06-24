@@ -1,6 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-const { initializeDatabase, dbAll, dbRun, dbGet } = require('./database.cjs');
+import express from 'express';
+import cors from 'cors';
+import { initializeDatabase, dbAll, dbRun, dbGet } from './database.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;

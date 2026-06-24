@@ -1,10 +1,14 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+import sqlite3Pkg from 'sqlite3';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+import fs from 'fs';
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
+const sqlite3 = sqlite3Pkg.verbose();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const dbPath = resolve(__dirname, 'database.sqlite');
 
-const db = new sqlite3.Database(dbPath, (err) => {
+export const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Could not connect to database', err);
   } else {
@@ -13,7 +17,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // Run a query and return a promise
-function dbRun(sql, params = []) {
+export function dbRun(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) {
@@ -26,7 +30,7 @@ function dbRun(sql, params = []) {
 }
 
 // Get all results
-function dbAll(sql, params = []) {
+export function dbAll(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
       if (err) {
@@ -39,7 +43,7 @@ function dbAll(sql, params = []) {
 }
 
 // Get a single result
-function dbGet(sql, params = []) {
+export function dbGet(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
       if (err) {
@@ -52,7 +56,7 @@ function dbGet(sql, params = []) {
 }
 
 // Initialize tables
-async function initializeDatabase() {
+export async function initializeDatabase() {
   await dbRun(`
     CREATE TABLE IF NOT EXISTS transactions (
       id TEXT PRIMARY KEY,
@@ -105,11 +109,3 @@ async function initializeDatabase() {
     console.log('Seeding completed.');
   }
 }
-
-module.exports = {
-  db,
-  dbRun,
-  dbAll,
-  dbGet,
-  initializeDatabase
-};
