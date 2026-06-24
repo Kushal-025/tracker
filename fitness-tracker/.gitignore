@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# SQLite Database Files
+# SQLite Database
 *.sqlite
 server/*.sqlite
-server/database.sqlite
-
