@@ -7,13 +7,13 @@ const types = ['All', 'beach', 'city', 'adventure', 'culture'];
 const typeLabels = { beach: '🏖️ Beach', city: '🌆 City', adventure: '🏔️ Adventure', culture: '🎭 Culture' };
 
 function DestModal({ dest, onClose }) {
-  const { savedIds, toggleSave, setPage, trips } = useTravel();
+  const { savedIds, toggleSave, setPage } = useTravel();
   const isSaved = savedIds.includes(dest.id);
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="glass rounded-3xl w-full max-w-2xl overflow-hidden border border-white/10 shadow-2xl shadow-amber-500/10" onClick={e => e.stopPropagation()}>
-        <div className="relative h-64">
+      <div className="glass rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/10 shadow-2xl shadow-accent/10" onClick={e => e.stopPropagation()}>
+        <div className="relative h-64 flex-shrink-0">
           <img src={dest.image} alt={dest.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent" />
           <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 glass rounded-full flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all">
@@ -26,15 +26,15 @@ function DestModal({ dest, onClose }) {
             <Heart size={16} className={isSaved ? 'fill-red-400 text-red-400' : 'text-white'} />
           </button>
           <div className="absolute bottom-4 left-5">
-            <p className="text-amber-400 text-xs font-medium mb-1 flex items-center gap-1"><MapPin size={11} />{dest.country}</p>
+            <p className="text-accent text-xs font-medium mb-1 flex items-center gap-1"><MapPin size={11} />{dest.country}</p>
             <h2 className="text-3xl font-black serif text-white">{dest.name}</h2>
           </div>
         </div>
         <div className="p-6">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
             <div className="flex items-center gap-1.5 glass px-3 py-1.5 rounded-full">
-              <Star size={13} className="fill-amber-400 text-amber-400" />
-              <span className="text-sm font-semibold text-amber-300">{dest.rating} / 5.0</span>
+              <Star size={13} className="fill-accent text-accent" />
+              <span className="text-sm font-semibold text-accent/90">{dest.rating} / 5.0</span>
             </div>
             <div className="flex items-center gap-1.5 glass px-3 py-1.5 rounded-full">
               <IndianRupee size={13} className="text-emerald-400" />
@@ -56,7 +56,7 @@ function DestModal({ dest, onClose }) {
           <div className="flex gap-3">
             <button
               onClick={() => { setPage('trips'); onClose(); }}
-              className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 cursor-pointer text-sm"
+              className="flex-1 py-3 bg-gradient-to-r from-gradient-start to-gradient-end text-white font-semibold rounded-xl hover:brightness-110 transition-all shadow-lg shadow-accent/20 cursor-pointer text-sm"
             >
               Plan a Trip Here
             </button>
@@ -108,40 +108,45 @@ export default function Explore() {
           />
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <div className="flex gap-2 flex-wrap">
-            <span className="text-xs text-slate-500 self-center">Continent:</span>
+        <div className="space-y-3">
+          {/* Horizontally scrollable list on mobile viewports */}
+          <div className="flex gap-2 flex-nowrap overflow-x-auto scrollbar-none pb-1 -mx-6 px-6 md:mx-0 md:px-0 md:flex-wrap items-center">
+            <span className="text-xs text-slate-500 whitespace-nowrap self-center mr-1">Continent:</span>
             {continents.map(c => (
               <button key={c} onClick={() => setContinent(c)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${continent === c ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' : 'glass text-slate-400 border border-white/5 hover:text-white'}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${continent === c ? 'bg-accent-light text-accent border border-accent-border' : 'glass text-slate-400 border border-white/5 hover:text-white'}`}>
                 {c}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="flex flex-wrap gap-3 items-center justify-between">
-          <div className="flex gap-2 flex-wrap items-center">
-            <span className="text-xs text-slate-500">Type:</span>
-            {types.map(t => (
-              <button key={t} onClick={() => setType(t)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-all cursor-pointer ${type === t ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' : 'glass text-slate-400 border border-white/5 hover:text-white'}`}>
-                {t === 'All' ? 'All Types' : typeLabels[t]}
-              </button>
-            ))}
+          <div className="flex flex-col sm:flex-row gap-3 justify-between sm:items-center">
+            {/* Horizontally scrollable list on mobile viewports */}
+            <div className="flex gap-2 flex-nowrap overflow-x-auto scrollbar-none pb-1 -mx-6 px-6 sm:mx-0 sm:px-0 sm:flex-wrap items-center">
+              <span className="text-xs text-slate-500 whitespace-nowrap self-center mr-1">Type:</span>
+              {types.map(t => (
+                <button key={t} onClick={() => setType(t)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-all cursor-pointer whitespace-nowrap ${type === t ? 'bg-accent-light text-accent border border-accent-border' : 'glass text-slate-400 border border-white/5 hover:text-white'}`}>
+                  {t === 'All' ? 'All Types' : typeLabels[t]}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex justify-end">
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2 text-xs rounded-xl cursor-pointer">
+                <option value="rating" className="bg-slate-800">Sort: Top Rated</option>
+                <option value="price" className="bg-slate-800">Sort: Price Low-High</option>
+              </select>
+            </div>
           </div>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2 text-xs rounded-xl">
-            <option value="rating" className="bg-slate-800">Sort: Top Rated</option>
-            <option value="price" className="bg-slate-800">Sort: Price Low-High</option>
-          </select>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtered.map(dest => {
+        {filtered.map((dest, i) => {
           const isSaved = savedIds.includes(dest.id);
           return (
-            <div key={dest.id} className="dest-card card-hover glass border border-white/8 cursor-pointer" style={{ height: '280px' }} onClick={() => setSelectedDest(dest)}>
+            <div key={dest.id} className="dest-card card-hover glass border border-white/8 cursor-pointer animate-scale-in" style={{ height: '280px', animationDelay: `${i * 50}ms` }} onClick={() => setSelectedDest(dest)}>
               <img src={dest.image} alt={dest.name} loading="lazy" />
               <div className="dest-overlay" />
               <button
@@ -152,14 +157,14 @@ export default function Explore() {
               </button>
               <span className="absolute top-3 left-3 tag z-10 capitalize">{typeLabels[dest.type] || dest.type}</span>
               <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                <p className="text-amber-400 text-xs font-medium mb-0.5 flex items-center gap-1"><MapPin size={10} />{dest.country}</p>
+                <p className="text-accent text-xs font-medium mb-0.5 flex items-center gap-1"><MapPin size={10} />{dest.country}</p>
                 <h3 className="text-white font-bold text-xl serif">{dest.name}</h3>
                 <div className="flex items-center justify-between mt-1.5">
                   <div className="flex items-center gap-1">
-                    <Star size={11} className="fill-amber-400 text-amber-400" />
-                    <span className="text-xs text-amber-300 font-semibold">{dest.rating}</span>
+                    <Star size={11} className="fill-accent text-accent" />
+                    <span className="text-xs text-accent/90 font-semibold">{dest.rating}</span>
                   </div>
-                  <span className="text-xs text-white/60">from <span className="text-amber-400 font-bold">₹{dest.price}</span></span>
+                  <span className="text-xs text-white/60">from <span className="text-accent font-bold">₹{dest.price}</span></span>
                 </div>
               </div>
             </div>

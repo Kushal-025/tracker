@@ -24,6 +24,10 @@ function AppContent() {
   return (
     <div className="min-h-screen relative">
       <div className="aurora" />
+      <div className="particles">
+        <div className="particles-layer" />
+        <div className="particles-layer-2" />
+      </div>
       <Navbar />
       <main className="relative z-10 pt-20">
         <Page />

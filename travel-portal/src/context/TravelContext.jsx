@@ -17,7 +17,7 @@ const destinations = [
   { id: 12, name: 'Iceland', country: 'Iceland', continent: 'Europe', type: 'adventure', rating: 4.9, price: 2600, image: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=600&q=80', tags: ['Aurora', 'Geothermal', 'Unique'], desc: 'Northern Lights, geysers, waterfalls, and volcanic landscapes — Iceland is like another planet.' },
 ];
 
-const packingCategories = {
+const defaultPackingCategories = {
   documents: { label: 'Documents', icon: '📄', items: ['Passport', 'Visa', 'Travel insurance', 'Flight tickets', 'Hotel bookings', 'Emergency contacts'] },
   clothing: { label: 'Clothing', icon: '👕', items: ['T-shirts (5)', 'Pants (3)', 'Underwear (7)', 'Socks (7)', 'Jacket', 'Swimwear', 'Formal outfit', 'Comfortable shoes', 'Sandals'] },
   toiletries: { label: 'Toiletries', icon: '🧴', items: ['Toothbrush & paste', 'Shampoo', 'Deodorant', 'Sunscreen SPF50+', 'Moisturizer', 'Razor', 'Medicine kit'] },
@@ -27,6 +27,10 @@ const packingCategories = {
 
 export function TravelProvider({ children }) {
   const [page, setPage] = useState('home');
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('tw_theme') || 'amber';
+  });
 
   const [savedIds, setSavedIds] = useState(() => {
     const s = localStorage.getItem('tw_saved');
@@ -40,13 +44,13 @@ export function TravelProvider({ children }) {
         id: 1, name: 'Europe Summer 2026', destination: 'Paris', startDate: '2026-07-15', endDate: '2026-07-25',
         budget: 2500, spent: 1240, status: 'upcoming', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80',
         itinerary: [
-          { day: 1, title: 'Arrival & Eiffel Tower', notes: 'Land at CDG, check in, evening at Eiffel Tower' },
-          { day: 2, title: 'Louvre & Montmartre', notes: 'Full day at Louvre, evening in Montmartre' },
+          { id: 101, day: 1, title: 'Arrival & Eiffel Tower', notes: 'Land at CDG, check in, evening at Eiffel Tower' },
+          { id: 102, day: 2, title: 'Louvre & Montmartre', notes: 'Full day at Louvre, evening in Montmartre' },
         ],
         expenses: [
-          { id: 1, category: 'Flights', amount: 620, label: 'Round trip flights' },
-          { id: 2, category: 'Hotel', amount: 480, label: '5 nights hotel' },
-          { id: 3, category: 'Food', amount: 140, label: 'Restaurants & cafés' },
+          { id: 201, category: 'Flights', amount: 620, label: 'Round trip flights' },
+          { id: 202, category: 'Hotel', amount: 480, label: '5 nights hotel' },
+          { id: 203, category: 'Food', amount: 140, label: 'Restaurants & cafés' },
         ]
       },
       {
@@ -58,20 +62,31 @@ export function TravelProvider({ children }) {
     ];
   });
 
+  const [packingCategories, setPackingCategories] = useState(() => {
+    const s = localStorage.getItem('tw_packing_categories');
+    return s ? JSON.parse(s) : defaultPackingCategories;
+  });
+
   const [packingList, setPackingList] = useState(() => {
     const s = localStorage.getItem('tw_packing');
     if (s) return JSON.parse(s);
     const initial = {};
-    Object.keys(packingCategories).forEach(cat => {
-      initial[cat] = packingCategories[cat].items.map((item, i) => ({ id: `${cat}-${i}`, label: item, checked: false }));
+    Object.keys(defaultPackingCategories).forEach(cat => {
+      initial[cat] = defaultPackingCategories[cat].items.map((item, i) => ({ id: `${cat}-${i}`, label: item, checked: false }));
     });
     return initial;
   });
 
   const [selectedDest, setSelectedDest] = useState(null);
 
+  useEffect(() => {
+    localStorage.setItem('tw_theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   useEffect(() => { localStorage.setItem('tw_saved', JSON.stringify(savedIds)); }, [savedIds]);
   useEffect(() => { localStorage.setItem('tw_trips', JSON.stringify(trips)); }, [trips]);
+  useEffect(() => { localStorage.setItem('tw_packing_categories', JSON.stringify(packingCategories)); }, [packingCategories]);
   useEffect(() => { localStorage.setItem('tw_packing', JSON.stringify(packingList)); }, [packingList]);
 
   const toggleSave = (id) => {
@@ -82,8 +97,16 @@ export function TravelProvider({ children }) {
     setTrips(prev => [...prev, { ...trip, id: Date.now(), itinerary: [], expenses: [] }]);
   };
 
+  const deleteTrip = (tripId) => {
+    setTrips(prev => prev.filter(t => t.id !== tripId));
+  };
+
   const addItineraryDay = (tripId, day) => {
-    setTrips(prev => prev.map(t => t.id === tripId ? { ...t, itinerary: [...t.itinerary, { ...day, id: Date.now() }] } : t));
+    setTrips(prev => prev.map(t => t.id === tripId ? { ...t, itinerary: [...t.itinerary, { ...day, id: Date.now(), day: Number(day.day) }].sort((a,b) => a.day - b.day) } : t));
+  };
+
+  const deleteItineraryDay = (tripId, dayId) => {
+    setTrips(prev => prev.map(t => t.id === tripId ? { ...t, itinerary: t.itinerary.filter(d => d.id !== dayId) } : t));
   };
 
   const addExpense = (tripId, expense) => {
@@ -94,26 +117,100 @@ export function TravelProvider({ children }) {
     }));
   };
 
+  const deleteExpense = (tripId, expenseId) => {
+    setTrips(prev => prev.map(t => {
+      if (t.id !== tripId) return t;
+      const exp = t.expenses.find(e => e.id === expenseId);
+      const amt = exp ? Number(exp.amount) : 0;
+      return {
+        ...t,
+        spent: Math.max(0, t.spent - amt),
+        expenses: t.expenses.filter(e => e.id !== expenseId)
+      };
+    }));
+  };
+
+  const editExpense = (tripId, expenseId, updatedExpense) => {
+    setTrips(prev => prev.map(t => {
+      if (t.id !== tripId) return t;
+      const exp = t.expenses.find(e => e.id === expenseId);
+      const diff = Number(updatedExpense.amount) - (exp ? Number(exp.amount) : 0);
+      return {
+        ...t,
+        spent: Math.max(0, t.spent + diff),
+        expenses: t.expenses.map(e => e.id === expenseId ? { ...e, ...updatedExpense } : e)
+      };
+    }));
+  };
+
   const togglePacking = (cat, id) => {
     setPackingList(prev => ({
       ...prev,
-      [cat]: prev[cat].map(item => item.id === id ? { ...item, checked: !item.checked } : item)
+      [cat]: (prev[cat] || []).map(item => item.id === id ? { ...item, checked: !item.checked } : item)
     }));
   };
 
   const addPackingItem = (cat, label) => {
     setPackingList(prev => ({
       ...prev,
-      [cat]: [...prev[cat], { id: `${cat}-${Date.now()}`, label, checked: false }]
+      [cat]: [...(prev[cat] || []), { id: `${cat}-${Date.now()}`, label, checked: false }]
     }));
+  };
+
+  const deletePackingItem = (cat, id) => {
+    setPackingList(prev => ({
+      ...prev,
+      [cat]: (prev[cat] || []).filter(item => item.id !== id)
+    }));
+  };
+
+  const clearCheckedPackingItems = (cat) => {
+    setPackingList(prev => ({
+      ...prev,
+      [cat]: (prev[cat] || []).filter(item => !item.checked)
+    }));
+  };
+
+  const checkAllPackingItems = (cat) => {
+    setPackingList(prev => ({
+      ...prev,
+      [cat]: (prev[cat] || []).map(item => ({ ...item, checked: true }))
+    }));
+  };
+
+  const addPackingCategory = (label, icon) => {
+    const key = label.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    if (!key) return;
+    setPackingCategories(prev => ({
+      ...prev,
+      [key]: { label, icon, items: [] }
+    }));
+    setPackingList(prev => ({
+      ...prev,
+      [key]: []
+    }));
+  };
+
+  const deletePackingCategory = (key) => {
+    setPackingCategories(prev => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
+    setPackingList(prev => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
   };
 
   return (
     <TravelContext.Provider value={{
       page, setPage,
+      theme, setTheme,
       destinations, savedIds, toggleSave,
-      trips, addTrip, addItineraryDay, addExpense,
-      packingList, packingCategories, togglePacking, addPackingItem,
+      trips, addTrip, deleteTrip, addItineraryDay, deleteItineraryDay, addExpense, deleteExpense, editExpense,
+      packingList, packingCategories, togglePacking, addPackingItem, deletePackingItem, clearCheckedPackingItems, checkAllPackingItems, addPackingCategory, deletePackingCategory,
       selectedDest, setSelectedDest,
     }}>
       {children}
