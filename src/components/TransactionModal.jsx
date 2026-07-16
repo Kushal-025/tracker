@@ -2,18 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useDashboard } from '../context/DashboardContext';
 import { X } from 'lucide-react';
 
-export default function TransactionModal({ isOpen, onClose, activeItem }) {
-  const { addTransaction, editTransaction } = useDashboard();
-  const [form, setForm] = useState({ type: 'expense', category: 'Food', description: '', amount: '', date: '', status: 'Completed' });
+export default function TransactionModal({ isOpen, onClose, activeItem, defaultType }) {
+  const { addTransaction, editTransaction, darkMode } = useDashboard();
+  const initialType = defaultType || 'expense';
+  const [form, setForm] = useState({ type: initialType, category: 'Food', description: '', amount: '', date: '', status: 'Completed' });
 
   const categories = {
-    income: ['Salary', 'Freelance', 'Investments', 'Others'],
-    expense: ['Food', 'Travel', 'Shopping', 'Entertainment', 'Bills', 'Healthcare', 'Education', 'Others']
+    income:  ['Salary', 'Freelance', 'Investments', 'Others'],
+    expense: ['Food', 'Travel', 'Shopping', 'Entertainment', 'Bills', 'Healthcare', 'Education', 'Others'],
   };
 
   useEffect(() => {
     if (activeItem) setForm(activeItem);
-    else setForm({ type: 'expense', category: 'Food', description: '', amount: '', date: new Date().toISOString().split('T')[0], status: 'Completed' });
+    else setForm({
+      type: initialType,
+      category: initialType === 'income' ? 'Salary' : 'Food',
+      description: '',
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      status: 'Completed',
+    });
   }, [activeItem, isOpen]);
 
   const handleSubmit = (e) => {
@@ -26,48 +34,118 @@ export default function TransactionModal({ isOpen, onClose, activeItem }) {
 
   if (!isOpen) return null;
 
+  // Theme-aware classes
+  const modalBg       = darkMode ? 'bg-slate-900 border-purple-800/40' : 'bg-white border-emerald-100';
+  const labelClass    = 'block text-xs font-semibold uppercase tracking-wider mb-1.5 ' + (darkMode ? 'text-purple-300/70' : 'text-emerald-700/70');
+  const inputClass    = 'w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all ' +
+    (darkMode
+      ? 'bg-purple-950/30 border border-purple-800/40 text-white placeholder-purple-400/50 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500'
+      : 'bg-emerald-50/60 border border-emerald-200/60 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400');
+  const submitClass   = 'w-full py-3 mt-2 font-bold text-sm text-white rounded-xl shadow-lg transition-all ' +
+    (darkMode
+      ? 'bg-gradient-to-r from-purple-700 to-violet-600 hover:from-purple-600 hover:to-violet-500 shadow-purple-500/25'
+      : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-emerald-500/20');
+
+  // Type pill active styles
+  const expenseActive = darkMode
+    ? 'bg-purple-900/60 text-rose-300 shadow-sm border border-rose-800/40'
+    : 'bg-white text-rose-600 shadow-sm border border-rose-200/60';
+  const incomeActive = darkMode
+    ? 'bg-purple-900/60 text-emerald-300 shadow-sm border border-emerald-800/40'
+    : 'bg-white text-emerald-600 shadow-sm border border-emerald-200/60';
+  const typeBarBg = darkMode ? 'bg-purple-950/40 border border-purple-800/30' : 'bg-emerald-50/80 border border-emerald-200/40';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-800 p-6 relative shadow-2xl transition-transform duration-300">
-        <button onClick={onClose} className="absolute right-4 top-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
+      <div className={`w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border p-6 relative shadow-2xl transition-all duration-300 ${modalBg}`}>
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className={`absolute right-4 top-4 p-1.5 rounded-full transition-colors
+            ${darkMode ? 'hover:bg-purple-900/40 text-purple-300 hover:text-purple-100' : 'hover:bg-emerald-50 text-slate-400 hover:text-emerald-700'}`}
+        >
           <X className="w-5 h-5" />
         </button>
-        <h3 className="text-lg font-bold dark:text-white mb-4">{activeItem ? 'Update Ledger Entry' : 'Log New Transaction'}</h3>
-        
+
+        <h3 className={`text-lg font-bold mb-5 ${darkMode ? 'text-purple-100' : 'text-slate-900'}`}>
+          {activeItem ? 'Update Transaction' : 'Log New Transaction'}
+        </h3>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Type selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Transaction Pipeline Type</label>
-            <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-              <button type="button" onClick={() => setForm({ ...form, type: 'expense', category: 'Food' })} className={`py-2 text-sm font-semibold rounded-lg transition-all ${form.type === 'expense' ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-slate-500'}`}>Expense</button>
-              <button type="button" onClick={() => setForm({ ...form, type: 'income', category: 'Salary' })} className={`py-2 text-sm font-semibold rounded-lg transition-all ${form.type === 'income' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>Income</button>
+            <label className={labelClass}>Transaction Type</label>
+            <div className={`grid grid-cols-2 gap-2 p-1 rounded-xl ${typeBarBg}`}>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'expense', category: 'Food' })}
+                className={`py-2.5 text-sm font-bold rounded-lg transition-all ${form.type === 'expense' ? expenseActive : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+              >
+                Expense
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'income', category: 'Salary' })}
+                className={`py-2.5 text-sm font-bold rounded-lg transition-all ${form.type === 'income' ? incomeActive : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+              >
+                Income
+              </button>
             </div>
           </div>
 
+          {/* Category + Amount */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Category</label>
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+              <label className={labelClass}>Category</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className={inputClass}
+              >
                 {categories[form.type].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Amount (₹)</label>
-              <input type="number" required step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
+              <label className={labelClass}>Amount (₹)</label>
+              <input
+                type="number"
+                required
+                step="any"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                className={inputClass}
+                placeholder="0.00"
+              />
             </div>
           </div>
 
+          {/* Date */}
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Timestamp Matrix</label>
-            <input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
+            <label className={labelClass}>Date</label>
+            <input
+              type="date"
+              required
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              className={inputClass}
+            />
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Description Context</label>
-            <input type="text" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Merchant name or ledger notes..." />
+            <label className={labelClass}>Description</label>
+            <input
+              type="text"
+              required
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className={inputClass}
+              placeholder="e.g. Grocery run, salary, Netflix..."
+            />
           </div>
 
-          <button type="submit" className="w-full py-3 mt-2 font-bold text-sm text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
-            {activeItem ? 'Commit Pipeline Execution' : 'Deploy Ledger Entry'}
+          <button type="submit" className={submitClass}>
+            {activeItem ? '✓ Update Transaction' : '+ Add Transaction'}
           </button>
         </form>
       </div>

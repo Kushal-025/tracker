@@ -2,12 +2,24 @@ import React, { useMemo } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
 
-const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#eab308', '#22c55e', '#3b82f6', '#64748b'];
+// Light mode  → emerald palette for chart segments
+const COLORS_LIGHT = ['#10b981', '#34d399', '#059669', '#6ee7b7', '#0d9488', '#14b8a6', '#a7f3d0', '#064e3b'];
+// Dark mode   → purple palette for chart segments
+const COLORS_DARK  = ['#a855f7', '#c084fc', '#9333ea', '#d8b4fe', '#7c3aed', '#8b5cf6', '#ede9fe', '#4c1d95'];
 
 export default function AnalyticsCharts() {
-  const { transactions } = useDashboard();
+  const { transactions, darkMode } = useDashboard();
 
-  // Aggregate Category breakdown data for Expense Pie
+  const COLORS = darkMode ? COLORS_DARK : COLORS_LIGHT;
+  // Primary stroke/fill color per theme
+  const primaryColor   = darkMode ? '#a855f7' : '#10b981';
+  const gradientColor  = darkMode ? '#a855f7' : '#10b981';
+  const gradientId     = darkMode ? 'colorAmtDark' : 'colorAmtLight';
+  const gridColor      = darkMode ? '#1e1b4b' : '#d1fae5';
+  const axisColor      = darkMode ? '#7c3aed' : '#6ee7b7';
+  const tooltipBg      = darkMode ? '#1e1b4b' : '#f0fdf4';
+  const tooltipBorder  = darkMode ? '#7c3aed' : '#6ee7b7';
+
   const expenseByCategory = useMemo(() => {
     return transactions
       .filter((t) => t.type === 'expense')
@@ -20,7 +32,6 @@ export default function AnalyticsCharts() {
       }, []);
   }, [transactions]);
 
-  // Structural mapping configuration for chronological trendline
   const timelineData = useMemo(() => {
     return [...transactions]
       .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -31,60 +42,125 @@ export default function AnalyticsCharts() {
       }));
   }, [transactions]);
 
+  const cardClass = 'bg-white dark:bg-slate-900 rounded-2xl border border-emerald-100 dark:border-purple-900/40 shadow-sm';
+
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 my-6">
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm xl:col-span-2">
-        <h4 className="text-base font-semibold mb-4 dark:text-white">Cash Flow Dynamics</h4>
-        <div className="h-64 sm:h-72">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 my-4 sm:my-6">
+      {/* ── Area chart ── */}
+      <div className={`${cardClass} p-4 sm:p-6 xl:col-span-2 transition-all duration-300 hover:shadow-md hover:shadow-emerald-100 dark:hover:shadow-purple-900/20`}>
+        <div className="flex items-center gap-2 mb-4">
+          <div className={`w-2.5 h-2.5 rounded-full ${darkMode ? 'bg-purple-400' : 'bg-emerald-500'}`} />
+          <h4 className="text-base font-semibold text-slate-900 dark:text-white">Cash Flow Dynamics</h4>
+        </div>
+        <div className="h-64 sm:h-72 min-h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={timelineData}>
               <defs>
-                <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={gradientColor} stopOpacity={darkMode ? 0.25 : 0.18} />
+                  <stop offset="95%" stopColor={gradientColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
-              <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-              <Area type="monotone" dataKey="Amount" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorAmt)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={gridColor}
+              />
+              <XAxis
+                dataKey="date"
+                stroke={axisColor}
+                fontSize={11}
+                tickLine={false}
+                tick={{ fill: darkMode ? '#c084fc' : '#059669' }}
+              />
+              <YAxis
+                stroke={axisColor}
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: darkMode ? '#c084fc' : '#059669' }}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '14px',
+                  border: `1.5px solid ${tooltipBorder}`,
+                  background: tooltipBg,
+                  boxShadow: `0 4px 20px ${darkMode ? 'rgba(168,85,247,0.15)' : 'rgba(16,185,129,0.12)'}`,
+                  color: darkMode ? '#e9d5ff' : '#065f46',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+                cursor={{ stroke: primaryColor, strokeWidth: 1.5, strokeDasharray: '4 2' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="Amount"
+                stroke={primaryColor}
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill={`url(#${gradientId})`}
+                dot={{ r: 4, fill: primaryColor, strokeWidth: 2, stroke: darkMode ? '#1e1b4b' : '#fff' }}
+                activeDot={{ r: 6, fill: primaryColor, stroke: darkMode ? '#ede9fe' : '#fff', strokeWidth: 2 }}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-        <h4 className="text-base font-semibold mb-4 dark:text-white">Expense Distribution</h4>
-        <div className="h-56 sm:h-72 flex-1 relative min-h-[240px]">
+      {/* ── Pie chart ── */}
+      <div className={`${cardClass} p-4 sm:p-6 flex flex-col transition-all duration-300 hover:shadow-md hover:shadow-emerald-100 dark:hover:shadow-purple-900/20`}>
+        <div className="flex items-center gap-2 mb-4">
+          <div className={`w-2.5 h-2.5 rounded-full ${darkMode ? 'bg-purple-400' : 'bg-emerald-500'}`} />
+          <h4 className="text-base font-semibold text-slate-900 dark:text-white">Expense Distribution</h4>
+        </div>
+        <div className="h-56 sm:h-64 flex-1 relative min-h-[200px]">
           {expenseByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={expenseByCategory}
-                  innerRadius="40%"
-                  outerRadius="60%"
-                  paddingAngle={4}
+                  innerRadius="38%"
+                  outerRadius="62%"
+                  paddingAngle={5}
                   dataKey="value"
                   labelLine={false}
-                  isAnimationActive={false}
+                  isAnimationActive={true}
                 >
                   {expenseByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                      stroke={darkMode ? '#0f0a1e' : '#fff'}
+                      strokeWidth={2}
+                    />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: '14px',
+                    border: `1.5px solid ${tooltipBorder}`,
+                    background: tooltipBg,
+                    boxShadow: `0 4px 20px ${darkMode ? 'rgba(168,85,247,0.15)' : 'rgba(16,185,129,0.12)'}`,
+                    color: darkMode ? '#e9d5ff' : '#065f46',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-slate-400">No analytical data compiled</div>
+            <div className="flex h-full items-center justify-center text-sm text-slate-400">No data available</div>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 max-h-24 overflow-y-auto pr-1">
+        {/* Legend */}
+        <div className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3 max-h-24 overflow-y-auto pr-1">
           {expenseByCategory.map((entry, index) => (
-            <div key={entry.name} className="flex items-center gap-2 text-xs">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-              <span className="truncate text-slate-600 dark:text-slate-400">{entry.name}</span>
+            <div key={entry.name} className="flex items-center gap-1.5 text-xs">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span className="truncate text-slate-600 dark:text-purple-200 font-medium">{entry.name}</span>
             </div>
           ))}
         </div>

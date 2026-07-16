@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useDashboard } from '../context/DashboardContext';
 import { ArrowUpDown, Download, Edit3, Trash2 } from 'lucide-react';
 
-export default function TransactionTable({ onEdit }) {
-  const { transactions, deleteTransaction, searchQuery, categoryFilter, typeFilter } = useDashboard();
+export default function TransactionTable({ onEdit, filterType }) {
+  const { transactions, deleteTransaction, searchQuery, categoryFilter, typeFilter, darkMode } = useDashboard();
   const [sortField, setSortField] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
 
@@ -12,10 +12,12 @@ export default function TransactionTable({ onEdit }) {
   // Advanced pipeline sorting and parsing filtering configurations
   const filteredTransactions = transactions
     .filter(tx => {
-      const matchSearch = tx.description.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchSearch = tx.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           tx.category.toLowerCase().includes(searchQuery.toLowerCase());
       const matchCategory = categoryFilter === 'All' || tx.category === categoryFilter;
-      const matchType = typeFilter === 'All' || tx.type === typeFilter;
+      // If a filterType prop is provided (e.g., from IncomesPage), use it; otherwise use the context filter
+      const effectiveTypeFilter = filterType || typeFilter;
+      const matchType = effectiveTypeFilter === 'All' || tx.type === effectiveTypeFilter;
       return matchSearch && matchCategory && matchType;
     })
     .sort((a, b) => {
@@ -42,12 +44,17 @@ export default function TransactionTable({ onEdit }) {
     document.body.removeChild(link);
   };
 
+  const tableCard  = `bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-hidden border ${darkMode ? 'border-purple-900/40' : 'border-emerald-100'}`;
+  const headerRow   = `p-6 border-b flex flex-wrap items-center justify-between gap-4 ${darkMode ? 'border-purple-900/40' : 'border-emerald-100'}`;
+  const exportBtn   = `flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl transition-colors border ${darkMode ? 'border-purple-800/40 text-purple-300 hover:bg-purple-900/30' : 'border-emerald-200/60 text-emerald-700 hover:bg-emerald-50'}`;
+  const thSort      = `flex items-center gap-1 cursor-pointer select-none hover:${darkMode ? 'text-purple-300' : 'text-emerald-600'} transition-colors`;
+
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        <h4 className="text-base font-semibold dark:text-white">Transaction History</h4>
-        <div className="flex flex-wrap items-center gap-3">
-          <button onClick={exportToCSV} className="flex items-center gap-2 text-xs font-semibold border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
+    <div className={`${tableCard} overflow-hidden`}>
+      <div className={`${headerRow} flex-col sm:flex-row`}>
+        <h4 className={`text-base font-semibold ${darkMode ? 'text-purple-100' : 'text-slate-900'}`}>Transaction History</h4>
+        <div className="flex w-full sm:w-auto flex-wrap items-center gap-3">
+          <button onClick={exportToCSV} className={`${exportBtn} w-full justify-center sm:w-auto`}>
             <Download className="w-3.5 h-3.5" /> Export Statement
           </button>
         </div>
@@ -108,18 +115,18 @@ export default function TransactionTable({ onEdit }) {
       <div className="block md:hidden p-4 space-y-3">
         {filteredTransactions.map((tx) => (
           <div key={tx.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-slate-150 dark:border-slate-800 rounded-2xl p-4 space-y-3 transition-all hover:-translate-y-0.5 duration-350 hover:shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
+            <div className="flex justify-between items-start gap-3">
+              <div className="min-w-0">
                 <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">{tx.date}</p>
-                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-1 text-sm">{tx.description}</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-1 text-sm break-words">{tx.description}</p>
               </div>
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
                 {tx.category}
               </span>
             </div>
             
-            <div className="flex justify-between items-center pt-3 border-t border-slate-150 dark:border-slate-800">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-3 border-t border-slate-150 dark:border-slate-800">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`text-base font-extrabold ${tx.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {tx.type === 'income' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
                 </span>
